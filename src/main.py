@@ -18,7 +18,8 @@ load_dotenv(_env_path)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from api.insights import router as insights_router
 from api.plaid import router as plaid_router
@@ -62,13 +63,29 @@ app.include_router(insights_router)
 app.include_router(qa_router)
 
 
-@app.get("/")
-def root():
-    """Root route: redirect to API docs for Hugging Face and better UX."""
-    return RedirectResponse(url="/docs")
-
-
 @app.get("/health")
 def health() -> dict:
     """Health check endpoint."""
     return {"status": "ok"}
+
+
+# Static frontend (React build) - must be last so API routes take precedence
+_STATIC_DIR = Path(__file__).resolve().parent / "static"
+if _STATIC_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=str(_STATIC_DIR / "assets")), name="assets")
+
+    @app.get("/")
+    def serve_frontend():
+        """Serve React frontend at root."""
+        return FileResponse(str(_STATIC_DIR / "index.html"))
+
+    @app.get("/{full_path:path}")
+    def serve_react_app(full_path: str):
+        """SPA fallback: serve index.html for client-side routes."""
+        return FileResponse(str(_STATIC_DIR / "index.html"))
+else:
+    @app.get("/")
+    def root():
+        """Fallback when no static build: redirect to docs."""
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/docs")

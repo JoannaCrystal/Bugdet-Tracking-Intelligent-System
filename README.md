@@ -150,16 +150,28 @@ Set `DATABASE_URL` (optional):
 - **Default (SQLite)**: No config needed. Uses `sqlite:///./finance.db` for Hugging Face / simple deployment.
 - **PostgreSQL**: `postgresql://postgres:postgres@localhost:5432/finance_agent`
 
-### 3. Start the API
+### 3. Build frontend (optional, for full UI)
+
+To serve the React UI from FastAPI:
 
 ```bash
-cd finance-agent-system/src
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+cd finance-agent-system
+./scripts/build_frontend.sh
 ```
 
-API docs: http://localhost:8000/docs
+Or manually: `cd frontend && npm install && npm run build` then copy `frontend/dist/*` to `src/static/`.
 
-### 4. Endpoints
+### 4. Start the API
+
+```bash
+cd finance-agent-system
+uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+- **With static build**: http://localhost:8000/ serves the React UI
+- **API docs**: http://localhost:8000/docs
+
+### 5. Endpoints
 
 | Method | Endpoint                          | Description                      |
 |--------|-----------------------------------|----------------------------------|
