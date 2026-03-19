@@ -1,3 +1,13 @@
+---
+title: Finance Agentic System
+emoji: 💰
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_file: app.py
+pinned: false
+---
+
 # Finance Agentic System
 
 A **Personal Finance & Budgeting Agentic System** built with Python, LangGraph, FastAPI, and PostgreSQL. The system ingests transactions from multiple sources, normalizes and deduplicates them, and stores clean data for analysis. Future phases will add AI-powered categorization, spending insights, subscription detection, savings plans, and investment suggestions.
