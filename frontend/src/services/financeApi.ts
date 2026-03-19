@@ -6,7 +6,7 @@ import { apiClient } from "./api";
 import type {
   OverviewSummary,
   SpendingResponse,
-  SubscriptionsResponse,
+  SubscriptionsResponseApi,
   SavingsPlanResponse,
   SavingsPlanResult,
   InvestmentSuggestionsResponse,
@@ -33,7 +33,7 @@ export async function getSpending(
 export async function getSubscriptions(
   userId: string = DEFAULT_USER,
   months: number = 6
-): Promise<SubscriptionsResponse> {
+): Promise<SubscriptionsResponseApi> {
   const { data } = await apiClient.get(
     `/insights/subscriptions?user_id=${userId}&months=${months}`
   );

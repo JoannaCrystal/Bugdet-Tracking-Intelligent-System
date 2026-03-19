@@ -44,11 +44,30 @@ export interface SubscriptionItem {
   avg_amount?: number;
   annual_cost?: number;
   confidence?: string;
+  reasoning?: string;
+}
+
+/** Raw API response shape (backend uses different field names) */
+export interface SubscriptionItemApi {
+  merchant: string;
+  likely_frequency?: string | null;
+  average_amount?: number | null;
+  estimated_annual_cost?: number | null;
+  confidence?: string;
+  reasoning?: string;
 }
 
 export interface SubscriptionsResponse {
   user_id: string;
   subscriptions: SubscriptionItem[];
+  total_monthly_spend: number | null;
+  count: number;
+  narrative_summary?: string;
+}
+
+export interface SubscriptionsResponseApi {
+  user_id: string;
+  subscriptions: SubscriptionItemApi[];
   total_monthly_spend: number | null;
   count: number;
   narrative_summary?: string;

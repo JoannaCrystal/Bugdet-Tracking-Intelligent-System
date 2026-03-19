@@ -31,12 +31,12 @@ export function SubscriptionSummaryTable({ subscriptions }: SubscriptionSummaryT
           {subscriptions.map((s, i) => (
             <tr key={`${s.merchant}-${i}`} className="hover:bg-slate-50/50">
               <td className="px-4 py-2.5 font-medium text-slate-900">{s.merchant}</td>
-              <td className="px-4 py-2.5 text-slate-600">{s.frequency || "—"}</td>
+              <td className="px-4 py-2.5 text-slate-600">{s.frequency || "N/A"}</td>
               <td className="px-4 py-2.5 text-right text-slate-700">
-                {s.avg_amount != null ? formatCurrency(-s.avg_amount) : "—"}
+                {formatCurrency(-(s.avg_amount ?? 0))}
               </td>
               <td className="px-4 py-2.5 text-right text-slate-700">
-                {s.annual_cost != null ? formatCurrency(-s.annual_cost) : "—"}
+                {formatCurrency(-(s.annual_cost ?? 0))}
               </td>
               <td className="px-4 py-2.5">
                 <StatusPill
