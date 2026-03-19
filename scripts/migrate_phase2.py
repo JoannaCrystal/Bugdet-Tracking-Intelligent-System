@@ -26,20 +26,27 @@ def migrate() -> None:
     from utils.config import get_config
 
     config = get_config()
-    engine = create_engine(config.database.url)
     url = config.database.url.lower()
+    is_sqlite = "sqlite" in url
 
+    engine_kwargs = {}
+    if is_sqlite:
+        engine_kwargs["connect_args"] = {"check_same_thread": False}
+    engine = create_engine(config.database.url, **engine_kwargs)
+
+    # (name, postgres_def, sqlite_def)
     columns_to_add = [
-        ("user_id", "VARCHAR(64) DEFAULT 'default'"),
-        ("category_confidence", "FLOAT"),
-        ("is_subscription", "BOOLEAN DEFAULT FALSE"),
-        ("subscription_confidence", "FLOAT"),
+        ("user_id", "VARCHAR(64) DEFAULT 'default'", "TEXT DEFAULT 'default'"),
+        ("category_confidence", "FLOAT", "REAL"),
+        ("is_subscription", "BOOLEAN DEFAULT FALSE", "INTEGER DEFAULT 0"),
+        ("subscription_confidence", "FLOAT", "REAL"),
     ]
 
     with engine.connect() as conn:
-        for col_name, col_def in columns_to_add:
+        for col_name, pg_def, sqlite_def in columns_to_add:
+            col_def = sqlite_def if is_sqlite else pg_def
             try:
-                if "postgresql" in url:
+                if not is_sqlite:
                     conn.execute(
                         text(
                             f"ALTER TABLE transactions ADD COLUMN IF NOT EXISTS {col_name} {col_def}"

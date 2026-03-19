@@ -145,11 +145,10 @@ Start PostgreSQL and create a database:
 createdb finance_agent
 ```
 
-Set `DATABASE_URL` (or use default):
+Set `DATABASE_URL` (optional):
 
-```
-postgresql://postgres:postgres@localhost:5432/finance_agent
-```
+- **Default (SQLite)**: No config needed. Uses `sqlite:///./finance.db` for Hugging Face / simple deployment.
+- **PostgreSQL**: `postgresql://postgres:postgres@localhost:5432/finance_agent`
 
 ### 3. Start the API
 
@@ -215,7 +214,7 @@ If Plaid is not configured, the API returns 503 with a message to use Upload Sta
 
 | Variable        | Default                               | Description          |
 |-----------------|----------------------------------------|----------------------|
-| `DATABASE_URL`  | `postgresql://postgres:postgres@localhost:5432/finance_agent` | PostgreSQL URL |
+| `DATABASE_URL`  | `sqlite:///./finance.db` | SQLite by default; set for PostgreSQL |
 | `PLAID_CLIENT_ID` | -                                  | Plaid client ID      |
 | `PLAID_SECRET`  | -                                     | Plaid secret         |
 | `PLAID_ENV`     | `sandbox`                             | Plaid environment    |

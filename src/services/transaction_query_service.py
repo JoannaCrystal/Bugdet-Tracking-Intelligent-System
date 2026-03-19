@@ -7,7 +7,7 @@ Provides reusable functions for querying transactions by user, date range, and c
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import case, func, or_
+from sqlalchemy import Integer, case, cast, func, or_
 from sqlalchemy.orm import Session
 
 from database.models import Transaction
@@ -73,6 +73,20 @@ def get_transactions_for_user(
     return query.all()
 
 
+def _year_month_expr(session: Session):
+    """SQLite-safe year/month extraction."""
+    dialect = session.get_bind().dialect.name
+    if dialect == "sqlite":
+        return (
+            cast(func.strftime("%Y", Transaction.date), Integer).label("year"),
+            cast(func.strftime("%m", Transaction.date), Integer).label("month"),
+        )
+    return (
+        func.extract("year", Transaction.date).label("year"),
+        func.extract("month", Transaction.date).label("month"),
+    )
+
+
 def get_monthly_totals(
     session: Session,
     user_id: str = DEFAULT_USER_ID,
@@ -83,24 +97,22 @@ def get_monthly_totals(
 
     Returns list of dicts with year, month, total_income, total_expenses, net.
     """
+    year_col, month_col = _year_month_expr(session)
     q = session.query(
-        func.extract("year", Transaction.date).label("year"),
-        func.extract("month", Transaction.date).label("month"),
+        year_col,
+        month_col,
         func.sum(case((Transaction.amount > 0, Transaction.amount), else_=0)).label(
             "income"
         ),
         func.sum(case((Transaction.amount < 0, func.abs(Transaction.amount)), else_=0)).label(
             "expenses"
         ),
-    ).group_by(
-        func.extract("year", Transaction.date),
-        func.extract("month", Transaction.date),
-    )
+    ).group_by(year_col, month_col)
 
     if hasattr(Transaction, "user_id"):
         q = _user_filter(q, user_id)
     if year:
-        q = q.filter(func.extract("year", Transaction.date) == year)
+        q = q.filter(year_col == year)
 
     rows = q.all()
     return [

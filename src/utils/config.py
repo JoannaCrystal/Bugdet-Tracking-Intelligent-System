@@ -21,12 +21,12 @@ class PlaidConfig(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    """PostgreSQL database configuration."""
+    """Database configuration. Defaults to SQLite for Hugging Face / simple deployment."""
 
     url: str = Field(
         default_factory=lambda: os.getenv(
             "DATABASE_URL",
-            "postgresql://postgres:postgres@localhost:5432/finance_agent",
+            "sqlite:///./finance.db",
         )
     )
 
