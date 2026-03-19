@@ -18,6 +18,7 @@ load_dotenv(_env_path)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from api.insights import router as insights_router
 from api.plaid import router as plaid_router
@@ -59,6 +60,12 @@ app.include_router(transactions_router)
 app.include_router(plaid_router)
 app.include_router(insights_router)
 app.include_router(qa_router)
+
+
+@app.get("/")
+def root():
+    """Root route: redirect to API docs for Hugging Face and better UX."""
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/health")
